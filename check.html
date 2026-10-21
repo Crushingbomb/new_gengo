@@ -1,0 +1,109 @@
+<!-- Output: html -->
+<!-- File: check.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>サムネイル設定チェック</title>
+<style>
+  body { margin: 0; padding: 20px; background: #f6f1e7; font-family: system-ui, sans-serif; color: #222; line-height: 1.6; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; }
+  ul { list-style: none; padding: 0; }
+  li { background: #fffdf8; border: 1px solid #e2d8c6; border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; }
+  li.ng { border-color: #b7282e; background: #fdf0f0; }
+  .fix { display: block; font-size: 13px; color: #b7282e; margin-top: 4px; }
+  code { word-break: break-all; background: #efe8da; padding: 1px 4px; border-radius: 4px; }
+  img { max-width: 100%; border-radius: 8px; margin-top: 8px; }
+  .summary { font-weight: 700; font-size: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Xカード（サムネイル）設定チェック</h1>
+  <p id="summary" class="summary">チェック中…</p>
+  <ul id="results"></ul>
+  <div id="preview"></div>
+</main>
+<script>
+const results = document.getElementById('results');
+const base = location.href.replace(/check\.html.*$/, '').replace(/[?#].*$/, '');
+
+function add(ok, title, detail = '', fix = '') {
+  const li = document.createElement('li');
+  li.className = ok ? 'ok' : 'ng';
+  li.innerHTML = `${ok ? '✅' : '❌'} <b>${title}</b>${detail ? `<br><small>${detail}</small>` : ''}${!ok && fix ? `<span class="fix">対処：${fix}</span>` : ''}`;
+  results.appendChild(li);
+  return ok;
+}
+
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function loadImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve({ ok: true, w: img.naturalWidth, h: img.naturalHeight });
+    img.onerror = () => resolve({ ok: false });
+    img.src = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+  });
+}
+
+async function run() {
+  let allOk = true;
+  const ok = (v) => { if (!v) allOk = false; return v; };
+
+  let doc;
+  try {
+    const res = await fetch(base, { cache: 'no-store' });
+    ok(add(res.ok, 'index.html を読み込めた', `<code>${esc(base)}</code>`, 'index.html が同じ場所にあるか確認してください'));
+    const html = await res.text();
+    doc = new DOMParser().parseFromString(html, 'text/html');
+    ok(add(!html.includes('YOUR-NAME'), 'YOUR-NAME が残っていない', '', 'index.html 内の YOUR-NAME を自分のユーザー名に置き換えてください'));
+  } catch (err) {
+    add(false, 'index.html を読み込めません', esc(err.message), 'check.html を index.html と同じリポジトリに置き、github.io のURLで開いてください');
+    document.getElementById('summary').textContent = '❌ チェックできませんでした';
+    return;
+  }
+
+  const meta = (key) => doc.querySelector(`meta[property="${key}"], meta[name="${key}"]`)?.content || '';
+  const card = meta('twitter:card');
+  const ogImage = meta('og:image');
+  const twImage = meta('twitter:image');
+  const ogUrl = meta('og:url');
+
+  ok(add(card === 'summary_large_image', 'twitter:card が summary_large_image', `現在の値：<code>${esc(card || '（なし）')}</code>`, '<meta name="twitter:card" content="summary_large_image"> を head に書いてください'));
+  ok(add(!!ogImage, 'og:image がある', `<code>${esc(ogImage || '（なし）')}</code>`, 'og:image のメタタグを追加してください'));
+  ok(add(!!twImage, 'twitter:image がある', `<code>${esc(twImage || '（なし）')}</code>`, 'twitter:image のメタタグを追加してください'));
+
+  const imageUrl = twImage || ogImage;
+  if (imageUrl) {
+    ok(add(imageUrl.startsWith('https://'), '画像URLが https:// で始まる完全なURL', '', 'https://ユーザー名.github.io/リポジトリ名/ogp.png の形にしてください'));
+    const expected = `${base}ogp.png`;
+    ok(add(imageUrl === expected, '画像URLがこのサイトの ogp.png と一致', `設定値：<code>${esc(imageUrl)}</code><br>正しい値：<code>${esc(expected)}</code>`, '「正しい値」をコピーして og:image と twitter:image に貼ってください（大文字・小文字も一致させる）'));
+    const img = await loadImage(imageUrl);
+    ok(add(img.ok, '画像を実際に読み込めた', '', '画像URLを開くと404になっています。ファイル名と置き場所を確認してください'));
+    if (img.ok) {
+      ok(add(img.w >= 600 && img.h >= 314, `画像サイズ：${img.w}×${img.h}px`, '推奨は1200×630px', 'ogp-maker.html で作り直してください'));
+      document.getElementById('preview').innerHTML = `<p>読み込んだ画像：</p><img src="${esc(imageUrl)}" alt="">`;
+    }
+    try {
+      const r = await fetch(imageUrl, { cache: 'no-store' });
+      const size = (await r.blob()).size;
+      ok(add(size < 5 * 1024 * 1024, `ファイルサイズ：約${Math.round(size / 1024)}KB`, '5MB未満ならOK', '画像を小さくしてください'));
+    } catch {
+      // サイズ確認できない場合は省略
+    }
+  }
+
+  ok(add(ogUrl === base, 'og:url がこのページのURLと一致', `設定値：<code>${esc(ogUrl || '（なし）')}</code><br>正しい値：<code>${esc(base)}</code>`, '「正しい値」を og:url と canonical に貼ってください'));
+
+  document.getElementById('summary').textContent = allOk
+    ? '✅ 設定は正常です。Xには「' + base + '?v=2」のように末尾を変えたURLを貼ってください。'
+    : '❌ 赤い項目を直して、index.html をアップロードし直してください。';
+}
+run();
+</script>
+</body>
+</html>
