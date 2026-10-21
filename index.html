@@ -1,0 +1,778 @@
+<!-- Output: html -->
+<!-- File: index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#b7282e">
+<title>元号制定ゲーム｜君が新元号の名付け人になろう</title>
+<meta name="description" content="2027年から9999年までの元号を早い者勝ちで名付けるブラウザゲーム。漢字2文字・1〜30年で、君だけの元号を制定しよう。">
+<!-- ▼YOUR-NAME（4か所）を自分のGitHubユーザー名に一括置換 -->
+<link rel="canonical" href="https://YOUR-NAME.github.io/gengo-game/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23b7282e'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='white'%3E%E5%85%83%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="元号制定ゲーム">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:url" content="https://YOUR-NAME.github.io/gengo-game/">
+<meta property="og:title" content="元号制定ゲーム｜君が新元号の名付け人になろう">
+<meta property="og:description" content="2027年から9999年までの元号を早い者勝ちで名付けるブラウザゲーム。漢字2文字・1〜30年で、君だけの元号を制定しよう。">
+<meta property="og:image" content="https://YOUR-NAME.github.io/gengo-game/ogp.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="元号制定ゲーム　君が新元号の名付け人になろう。">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="元号制定ゲーム｜君が新元号の名付け人になろう">
+<meta name="twitter:description" content="2027年から9999年までの元号を早い者勝ちで名付けるブラウザゲーム。">
+<meta name="twitter:image" content="https://YOUR-NAME.github.io/gengo-game/ogp.png">
+<meta name="twitter:image:alt" content="元号制定ゲーム　君が新元号の名付け人になろう。">
+<!-- <meta name="twitter:site" content="@your_id"> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&family=Yuji+Syuku&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f1e7;
+    --card: #fffdf8;
+    --ink: #222;
+    --sub: #6b6358;
+    --accent: #b7282e;
+    --line: #e2d8c6;
+    --gold: #d4a017;
+    --w: 44px;
+    --serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --brush: "Yuji Syuku", "HG正楷書体-PRO", "HGSeikaishotaiPRO", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    line-height: 1.6;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  header { text-align: center; padding: calc(20px + env(safe-area-inset-top)) 16px 4px; }
+  h1 { font: 700 clamp(26px, 8vw, 36px)/1.3 var(--serif); margin: 0; letter-spacing: .08em; }
+  .lead { margin: 4px 0 8px; font-weight: 700; color: var(--accent); }
+  .mode { display: inline-block; font-size: 12px; padding: 2px 12px; border-radius: 999px; background: #e9e1d2; color: var(--sub); }
+  .mode.online { background: #dcefe0; color: #1e6b35; }
+  .mode.error { background: #f8dcdc; color: var(--accent); font-weight: 700; }
+  .noscript { max-width: 520px; margin: 12px auto; padding: 12px; background: #f8dcdc; color: var(--accent); border-radius: 10px; text-align: center; }
+  main { max-width: 520px; margin: 0 auto; padding: 0 12px 24px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 14px; scroll-margin-top: 12px; }
+  h2 { font-size: 17px; margin: 0 0 10px; border-left: 5px solid var(--accent); padding-left: 8px; }
+  .sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .sec-head h2 { margin: 0; }
+  .rules { font-size: 12px; color: var(--sub); margin: 8px 0 0; }
+  .stats { font-size: 12px; color: var(--sub); }
+  .make { display: grid; grid-template-columns: 92px 1fr; gap: 14px; align-items: start; }
+  .full { grid-column: 1 / -1; }
+  label { display: block; font-weight: 700; font-size: 13px; margin: 8px 0 4px; }
+  label:first-child { margin-top: 0; }
+  input, select { font: inherit; font-size: 17px; height: 44px; padding: 0 10px; border: 1px solid #cfc3ad; border-radius: 10px; background: #fff; width: 100%; color: inherit; }
+  #name { font-family: var(--serif); font-size: 22px; letter-spacing: .2em; }
+  .stepper { display: grid; grid-template-columns: 44px 1fr 44px; gap: 6px; }
+  .stepper input { text-align: center; padding: 0 4px; }
+  .hint { font-size: 12px; color: var(--sub); margin: 4px 0 0; min-height: 1.5em; }
+  .hint.err { color: var(--accent); font-weight: 700; }
+  .make .hint.full { margin: -6px 0 0; }
+  button, .btn-x { font: inherit; font-weight: 700; border: none; border-radius: 10px; min-height: 44px; padding: 0 16px; cursor: pointer; touch-action: manipulation; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; white-space: nowrap; }
+  .btn-main { background: var(--accent); color: #fff; width: 100%; font-size: 17px; min-height: 52px; }
+  .btn-main:disabled { background: #c9bfb0; cursor: not-allowed; }
+  .btn-sub { background: #ece4d6; color: var(--ink); font-size: 16px; }
+  .btn-text { background: none; color: var(--accent); padding: 0; min-height: 32px; font-size: 13px; }
+  .btn-x { background: #000; color: #fff; }
+  .btn-x.small { min-height: 34px; padding: 0 12px; font-size: 13px; }
+  .board-label { font-size: 11px; color: var(--sub); text-align: center; margin-bottom: 4px; }
+  .board { width: 92px; height: 176px; margin: 0 auto; display: grid; place-items: center; background: #fffef9; border: 8px solid #6b4423; border-radius: 4px; box-shadow: 0 6px 14px rgba(0, 0, 0, .2), inset 0 0 0 3px #f1e9d8; }
+  .board span { writing-mode: vertical-rl; font: 400 56px/1 var(--brush); letter-spacing: .08em; color: #111; }
+  .board span.placeholder { color: #d6cec0; }
+  .board.big { width: 116px; height: 220px; margin-bottom: 12px; }
+  .board.big span { font-size: 72px; }
+  .tl { overflow-x: auto; overscroll-behavior-x: contain; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .tl::-webkit-scrollbar { height: 12px; }
+  .tl::-webkit-scrollbar-track { background: #f3ede2; }
+  .tl::-webkit-scrollbar-thumb { background: #c9b99c; border-radius: 6px; }
+  .track { position: relative; height: 92px; cursor: pointer; }
+  .years { position: absolute; inset: 0; }
+  .yr { position: absolute; top: 0; bottom: 0; width: var(--w); border-left: 1px solid #f1eadc; font-size: 10px; color: #a39a8c; text-align: center; padding-top: 3px; }
+  .yr.dec { border-left: 2px solid #cdbb98; color: var(--ink); font-weight: 700; }
+  .blk { position: absolute; top: 22px; bottom: 8px; display: grid; place-items: center; border-radius: 6px; background: hsl(var(--h) 65% 80%); border: 1px solid hsl(var(--h) 45% 58%); font: 400 17px/1 var(--brush); overflow: hidden; white-space: nowrap; }
+  .blk.mine { border: 3px solid var(--gold); }
+  .blk.mine::after { content: "★"; position: absolute; top: 1px; right: 3px; font-size: 10px; color: var(--gold); }
+  .sel-box { position: absolute; top: 18px; bottom: 4px; border: 3px solid var(--accent); border-radius: 8px; background: rgba(183, 40, 46, .15); pointer-events: none; transition: left .2s, width .2s; }
+  .ov { display: block; width: 100%; height: 28px; margin-top: 8px; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+  .ov-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--sub); margin-top: 2px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--sub); margin: 8px 0 0; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+  .conv { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .result { margin-top: 10px; padding: 12px; border-radius: 10px; background: #f3ede2; }
+  .result strong { font: 400 28px var(--brush); color: var(--accent); }
+  .result small { color: var(--sub); }
+  .share-row { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .list { list-style: none; padding: 0; margin: 0; }
+  .list li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 10px 2px; border-bottom: 1px dashed var(--line); }
+  .era-name { font: 400 26px/1.2 var(--brush); min-width: 2.4em; }
+  .era-period { color: var(--sub); font-size: 13px; flex: 1; }
+  .badge { font-size: 11px; background: var(--gold); color: #fff; border-radius: 999px; padding: 1px 8px; }
+  .list .empty { color: var(--sub); justify-content: center; font-size: 14px; }
+  .more { width: 100%; margin-top: 10px; }
+  dialog { width: 100%; max-width: 520px; margin: auto auto 0; border: none; border-radius: 20px 20px 0 0; padding: 24px 20px calc(20px + env(safe-area-inset-bottom)); text-align: center; }
+  dialog::backdrop { background: rgba(0, 0, 0, .5); }
+  .dlg-title { font: 700 19px var(--serif); margin: 0 0 14px; }
+  .note { font-size: 12px; color: var(--accent); margin: 4px 0 0; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(255, 253, 248, .96); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(8px); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; padding: 6px 0; font-size: 11px; color: var(--sub); text-decoration: none; }
+  .tabbar b { font-size: 20px; line-height: 1.2; }
+  #toast { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 20; background: #333; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .3s; width: max-content; max-width: calc(100% - 32px); }
+  #toast.show { opacity: 1; }
+  #toast.err { background: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>元号制定ゲーム</h1>
+  <p class="lead">君が新元号の名付け人になろう。</p>
+  <span id="mode" class="mode">読み込み中…</span>
+</header>
+<noscript><p class="noscript">このゲームを遊ぶには JavaScript を有効にしてください。</p></noscript>
+
+<main>
+  <section id="make">
+    <h2>新元号を制定する</h2>
+    <form id="form" class="make" autocomplete="off">
+      <div>
+        <div class="board-label">新元号</div>
+        <div class="board"><span id="preview" class="placeholder">◯◯</span></div>
+      </div>
+      <div>
+        <label for="name">元号名（漢字2文字）</label>
+        <input id="name" type="text" placeholder="例：未来" autocapitalize="off" spellcheck="false" enterkeyhint="done">
+        <p id="nameHint" class="hint"></p>
+        <label for="start">開始年（西暦）</label>
+        <div class="stepper">
+          <button type="button" class="btn-sub" data-step="-1" aria-label="前の空き年へ">−</button>
+          <input id="start" type="number" inputmode="numeric" min="2027" max="9999">
+          <button type="button" class="btn-sub" data-step="1" aria-label="次の空き年へ">＋</button>
+        </div>
+        <button type="button" id="nextFree" class="btn-text">→ 最初の空き年にする</button>
+        <label for="len">期間</label>
+        <select id="len"></select>
+      </div>
+      <p id="periodHint" class="hint full"></p>
+      <button id="submit" class="btn-main full" type="submit" disabled>この元号を制定する</button>
+    </form>
+    <p id="rules" class="rules"></p>
+  </section>
+
+  <section id="timeline">
+    <div class="sec-head">
+      <h2>年表</h2>
+      <span id="stats" class="stats"></span>
+    </div>
+    <div id="tl" class="tl">
+      <div id="track" class="track">
+        <div id="years" class="years"></div>
+        <div id="blocks"></div>
+        <div id="selBox" class="sel-box" hidden></div>
+      </div>
+    </div>
+    <canvas id="ov" class="ov" aria-label="全期間の概要。タップでその年代へ移動"></canvas>
+    <div class="ov-label"><span id="ovMin"></span><span id="tlRange"></span><span id="ovMax"></span></div>
+    <p class="legend">
+      <span><i style="background:#fff;border:1px solid #ccc"></i>空き（タップで開始年に）</span>
+      <span><i style="background:hsl(30 65% 80%)"></i>制定済み</span>
+      <span><i style="border:3px solid #d4a017"></i>あなたが制定</span>
+      <span><i style="border:2px solid #b7282e"></i>選択中</span>
+    </p>
+  </section>
+
+  <section id="convert">
+    <h2>西暦 → 元号 変換</h2>
+    <form id="convForm" class="conv">
+      <input id="convYear" type="number" inputmode="numeric" placeholder="例：2030" min="1868" max="9999" aria-label="西暦">
+      <button class="btn-sub" type="submit">変換</button>
+    </form>
+    <div id="convResult" class="result" aria-live="polite"></div>
+  </section>
+
+  <section id="list-sec">
+    <div class="sec-head">
+      <h2>制定済みの元号（<span id="count">0</span>件）</h2>
+      <button type="button" id="reload" class="btn-sub" aria-label="最新の状態に更新">↻</button>
+    </div>
+    <ul id="list" class="list"></ul>
+    <button type="button" id="more" class="btn-sub more" hidden></button>
+  </section>
+</main>
+
+<nav class="tabbar">
+  <a href="#make"><b>✍️</b>制定</a>
+  <a href="#timeline"><b>📜</b>年表</a>
+  <a href="#convert"><b>🔁</b>変換</a>
+  <a href="#list-sec"><b>📋</b>一覧</a>
+</nav>
+
+<dialog id="confirmDlg">
+  <p class="dlg-title">この内容で制定しますか？</p>
+  <div class="board big"><span id="cfName"></span></div>
+  <p id="cfText"></p>
+  <p class="note">制定後は変更・取り消しができません。</p>
+  <div class="actions">
+    <button type="button" class="btn-sub" data-ans="no">やめる</button>
+    <button type="button" class="btn-main" data-ans="yes">制定する</button>
+  </div>
+</dialog>
+
+<dialog id="done">
+  <p class="dlg-title">新元号を制定しました！</p>
+  <div class="board big"><span id="doneName"></span></div>
+  <p id="doneText"></p>
+  <div class="actions">
+    <button type="button" id="doneClose" class="btn-sub">閉じる</button>
+    <a id="doneShare" class="btn-x" target="_blank" rel="noopener">𝕏 でシェア</a>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+// ===== ▼公開時に設定する項目 =====
+const CONFIG = {
+  SUPABASE_URL: '',   // 例: 'https://xxxxxxxx.supabase.co'（空ならデモモード）
+  SUPABASE_KEY: '',   // Publishable key（sb_publishable_…）または anon key。secret / service_role は絶対に入れない
+  SITE_URL: '',       // シェアに付けるURL。空なら公開中のページURLを自動使用
+  HASHTAGS: '#元号制定ゲーム',
+  MIN_YEAR: 2027,
+  MAX_YEAR: 9999,     // schema.sql の制約と揃えること
+  MAX_LENGTH: 30,
+};
+// ===== ▲ここまで =====
+
+const X_INTENT = 'https://x.com/intent/post';
+const W = 44;
+const TL_BUFFER = 20;
+const PAGE_SIZE = 1000;
+const LIST_STEP = 100;
+const { MIN_YEAR: MIN, MAX_YEAR: MAX, MAX_LENGTH } = CONFIG;
+const TOTAL = MAX - MIN + 1;
+const KANJI2 = /^[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]{2}$/;
+const REAL_ERAS = [
+  { name: '明治', start: 1868, end: 1912, to: '7月29日' },
+  { name: '大正', start: 1912, end: 1926, from: '7月30日', to: '12月24日' },
+  { name: '昭和', start: 1926, end: 1989, from: '12月25日', to: '1月7日' },
+  { name: '平成', start: 1989, end: 2019, from: '1月8日', to: '4月30日' },
+  { name: '令和', start: 2019, end: 2026, from: '5月1日' },
+];
+
+// ===== ユーティリティ =====
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const storage = {
+  get(key, fallback) {
+    try {
+      return JSON.parse(localStorage.getItem(key)) ?? fallback;
+    } catch {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // 保存できない環境では何もしない
+    }
+  },
+};
+
+const mine = new Set(storage.get('gengo-mine', []));
+const saveMine = () => storage.set('gengo-mine', [...mine]);
+let store = null;
+let eras = [];
+let busy = false;
+let listLimit = LIST_STEP;
+let lastRefresh = 0;
+
+const eraAt = (y) => eras.find((e) => e.start_year <= y && y <= e.end_year);
+const yearLabel = (name, n) => `${name}${n === 1 ? '元' : n}年`;
+const periodText = (s, e) => (s === e ? `${s}年` : `${s}年〜${e}年`);
+const hue = (name) => [...name].reduce((a, c) => a + c.codePointAt(0) * 7, 0) % 360;
+const eraShareText = (e) => `私は${periodText(e.start_year, e.end_year)}の元号を${e.name}として制定しました！`;
+
+// 秘密鍵（全権限）が誤って設定されていないか確認
+function isSecretKey(key) {
+  if (key.startsWith('sb_secret_')) return true;
+  try {
+    const payload = JSON.parse(atob(key.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return payload.role === 'service_role';
+  } catch {
+    return false;
+  }
+}
+
+function pageUrl() {
+  if (CONFIG.SITE_URL) return CONFIG.SITE_URL;
+  if (!location.protocol.startsWith('http')) return '';
+  return location.origin + location.pathname.replace(/index\.html$/, '');
+}
+
+function xIntent(text) {
+  const body = CONFIG.HASHTAGS ? `${text}\n${CONFIG.HASHTAGS}` : text;
+  const page = pageUrl();
+  return `${X_INTENT}?text=${encodeURIComponent(body)}${page ? `&url=${encodeURIComponent(page)}` : ''}`;
+}
+
+function maxLengthFrom(start) {
+  if (!Number.isInteger(start) || start < MIN || start > MAX || eraAt(start)) return 0;
+  const next = eras.find((e) => e.start_year > start);
+  return Math.min(MAX_LENGTH, next ? next.start_year - start : Infinity, MAX - start + 1);
+}
+
+function firstFreeYear() {
+  let y = MIN;
+  for (const e of eras) {
+    if (e.start_year <= y && y <= e.end_year) y = e.end_year + 1;
+  }
+  return y <= MAX ? y : null;
+}
+
+function setMode(text, cls = '') {
+  $('mode').textContent = text;
+  $('mode').className = `mode ${cls}`;
+}
+
+let toastTimer;
+function toast(msg, isErr = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = isErr ? 'show err' : 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ''; }, 3000);
+}
+
+function errorMessage(err) {
+  if (err?.code === '23P01') return 'タッチの差で先に制定されました。別の期間を選んでください。';
+  if (err?.code === '23514') return '条件（漢字2文字・期間・年の範囲）を満たしていません。';
+  if (err?.code === '42501') return 'サーバーの権限設定に問題があります（管理者はRLSとGRANTを確認）。';
+  return '通信エラーが発生しました。時間をおいて再度お試しください。';
+}
+
+// ===== 保存先（デモ: localStorage / オンライン: Supabase） =====
+const localStore = {
+  KEY: 'gengo-eras-demo',
+  async list() {
+    return storage.get(this.KEY, []);
+  },
+  async create(era) {
+    const all = await this.list();
+    if (all.some((e) => e.start_year <= era.end_year && era.start_year <= e.end_year)) {
+      throw Object.assign(new Error('overlap'), { code: '23P01' });
+    }
+    const id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+    const row = { id, ...era };
+    all.push(row);
+    storage.set(this.KEY, all);
+    return row;
+  },
+};
+
+async function createSupabaseStore() {
+  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+  const cols = 'id, name, start_year, end_year';
+  return {
+    async list() {
+      const rows = [];
+      for (let from = 0; ; from += PAGE_SIZE) {
+        const { data, error } = await db.from('eras').select(cols).order('start_year').range(from, from + PAGE_SIZE - 1);
+        if (error) throw error;
+        rows.push(...data);
+        if (data.length < PAGE_SIZE) break;
+      }
+      return rows;
+    },
+    async create(era) {
+      const { data, error } = await db.from('eras').insert(era).select(cols).single();
+      if (error) throw error;
+      return data;
+    },
+  };
+}
+
+// ===== フォーム =====
+function readForm() {
+  const name = $('name').value.trim();
+  const start = Number($('start').value);
+  const len = Number($('len').value);
+  const end = start + len - 1;
+  const maxLen = maxLengthFrom(start);
+  let nameErr = '';
+  let periodErr = '';
+  if (!name) nameErr = '元号名を入力してください';
+  else if (!KANJI2.test(name)) nameErr = '漢字2文字で入力してください';
+  if (!Number.isInteger(start) || start < MIN || start > MAX) periodErr = `開始年は${MIN}〜${MAX}年で入力してください`;
+  else if (eraAt(start)) periodErr = `${start}年はすでに「${eraAt(start).name}」の期間です`;
+  else if (len > maxLen) periodErr = `この開始年からは最長${maxLen}年までです`;
+  return { name, start, len, end, nameErr, periodErr, ok: !nameErr && !periodErr };
+}
+
+function updateForm({ follow = false } = {}) {
+  const maxLen = maxLengthFrom(Number($('start').value));
+  for (const opt of $('len').options) opt.disabled = maxLen > 0 && Number(opt.value) > maxLen;
+  if (maxLen > 0 && Number($('len').value) > maxLen) $('len').value = String(maxLen);
+
+  const f = readForm();
+  $('preview').textContent = f.name ? [...f.name].slice(0, 2).join('') : '◯◯';
+  $('preview').classList.toggle('placeholder', !!f.nameErr);
+
+  const dup = !f.nameErr && (eras.some((e) => e.name === f.name) || REAL_ERAS.some((e) => e.name === f.name));
+  const nh = $('nameHint');
+  nh.className = f.name && f.nameErr ? 'hint err' : 'hint';
+  nh.textContent = !f.name ? '漢字2文字で入力' : f.nameErr || (dup ? '⚠ 同名の元号あり（制定は可能）' : '✓ OK');
+
+  const ph = $('periodHint');
+  ph.className = f.periodErr ? 'hint full err' : 'hint full';
+  ph.textContent = f.periodErr
+    || `${periodText(f.start, f.end)}（${f.len}年間）｜${f.start}年が「${f.nameErr ? '◯◯' : f.name}元年」に`;
+
+  $('submit').disabled = !f.ok || busy || !store;
+  renderSelection(f, follow);
+}
+
+function stepYear(d) {
+  let y = Number($('start').value);
+  y = Number.isInteger(y) && y >= MIN && y <= MAX ? y + d : (firstFreeYear() ?? MIN);
+  const e = eraAt(y);
+  if (e) y = d > 0 ? e.end_year + 1 : e.start_year - 1;
+  $('start').value = Math.min(MAX, Math.max(MIN, y));
+  updateForm({ follow: true });
+}
+
+// ===== 年表（見えている範囲だけ描画） =====
+function scrollTimelineTo(year) {
+  const tl = $('tl');
+  const left = Math.max(0, (year - MIN) * W - tl.clientWidth / 3);
+  const far = Math.abs(left - tl.scrollLeft) > tl.clientWidth * 20;
+  tl.scrollTo({ left, behavior: far ? 'auto' : 'smooth' });
+}
+
+function renderTimeline() {
+  const tl = $('tl');
+  const first = Math.max(MIN, MIN + Math.floor(tl.scrollLeft / W) - TL_BUFFER);
+  const last = Math.min(MAX, MIN + Math.ceil((tl.scrollLeft + tl.clientWidth) / W) + TL_BUFFER);
+  let html = '';
+  for (let y = first; y <= last; y++) {
+    html += `<span class="yr${y % 10 === 0 ? ' dec' : ''}" style="left:${(y - MIN) * W}px">${y}</span>`;
+  }
+  $('years').innerHTML = html;
+  $('blocks').innerHTML = eras
+    .filter((e) => e.end_year >= first && e.start_year <= last)
+    .map((e) => {
+      const len = e.end_year - e.start_year + 1;
+      const style = `left:${(e.start_year - MIN) * W}px;width:${len * W}px;--h:${hue(e.name)}`;
+      const title = `${e.name}：${periodText(e.start_year, e.end_year)}`;
+      return `<div class="blk${mine.has(e.id) ? ' mine' : ''}" style="${style}" title="${esc(title)}">${esc(e.name)}</div>`;
+    })
+    .join('');
+  const viewFirst = Math.min(MAX, MIN + Math.floor(tl.scrollLeft / W));
+  const viewLast = Math.min(MAX, MIN + Math.floor((tl.scrollLeft + tl.clientWidth) / W));
+  $('tlRange').textContent = `表示中：${viewFirst}〜${viewLast}年`;
+  drawOverview();
+}
+
+let tlRaf = 0;
+function scheduleTimeline() {
+  if (tlRaf) return;
+  tlRaf = requestAnimationFrame(() => {
+    tlRaf = 0;
+    renderTimeline();
+  });
+}
+
+function drawOverview() {
+  const c = $('ov');
+  const w = c.clientWidth;
+  const h = 28;
+  if (!w) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (c.width !== Math.round(w * dpr)) {
+    c.width = Math.round(w * dpr);
+    c.height = Math.round(h * dpr);
+  }
+  const g = c.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.fillStyle = '#fff';
+  g.fillRect(0, 0, w, h);
+  const sx = w / TOTAL;
+  for (const e of eras) {
+    g.fillStyle = mine.has(e.id) ? '#d4a017' : `hsl(${hue(e.name)}, 55%, 62%)`;
+    g.fillRect((e.start_year - MIN) * sx, 4, Math.max(1, (e.end_year - e.start_year + 1) * sx), h - 8);
+  }
+  const tl = $('tl');
+  const vx = (tl.scrollLeft / W) * sx;
+  const vw = Math.max(4, (tl.clientWidth / W) * sx);
+  g.strokeStyle = '#b7282e';
+  g.lineWidth = 2;
+  g.strokeRect(Math.min(vx, w - vw) + 1, 1, vw - 2, h - 2);
+}
+
+function renderSelection(f, follow) {
+  const box = $('selBox');
+  box.hidden = !!f.periodErr;
+  if (f.periodErr) return;
+  box.style.left = `${(f.start - MIN) * W}px`;
+  box.style.width = `${f.len * W}px`;
+  if (follow) scrollTimelineTo(f.start);
+}
+
+function renderStats() {
+  const taken = eras.reduce((s, e) => s + e.end_year - e.start_year + 1, 0);
+  $('stats').textContent = `制定済み ${taken.toLocaleString()}年／空き ${(TOTAL - taken).toLocaleString()}年`;
+}
+
+// ===== 一覧・変換 =====
+function renderList() {
+  $('count').textContent = eras.length.toLocaleString();
+  const more = $('more');
+  if (!eras.length) {
+    $('list').innerHTML = '<li class="empty">まだ元号はありません。最初の名付け人になろう！</li>';
+    more.hidden = true;
+    return;
+  }
+  $('list').innerHTML = eras.slice(0, listLimit).map((e) => {
+    const len = e.end_year - e.start_year + 1;
+    const own = mine.has(e.id)
+      ? `<span class="badge">あなたが制定</span><a class="btn-x small" href="${esc(xIntent(eraShareText(e)))}" target="_blank" rel="noopener">𝕏 シェア</a>`
+      : '';
+    return `<li><span class="era-name">${esc(e.name)}</span><span class="era-period">${periodText(e.start_year, e.end_year)}（${len}年間）</span>${own}</li>`;
+  }).join('');
+  const rest = eras.length - listLimit;
+  more.hidden = rest <= 0;
+  more.textContent = `もっと見る（残り${rest.toLocaleString()}件）`;
+}
+
+function convertInfo(y) {
+  if (!Number.isInteger(y)) return { html: '西暦を整数で入力してください。' };
+  if (y < 1868) return { html: '1868年（明治元年）より前には対応していません。' };
+  if (y > MAX) return { html: `このゲームで扱うのは${MAX}年までです。` };
+  if (y < MIN) {
+    const hit = REAL_ERAS.filter((e) => e.start <= y && y <= e.end);
+    const html = hit.map((e) => {
+      const note = y === e.start && e.from ? `（${e.from}〜）` : y === e.end && e.to ? `（〜${e.to}）` : '';
+      return `<strong>${yearLabel(e.name, y - e.start + 1)}</strong><small>${note}</small>`;
+    }).join(' ／ ');
+    return { html: `西暦${y}年は ${html}`, label: hit.map((e) => yearLabel(e.name, y - e.start + 1)).join('／') };
+  }
+  const e = eraAt(y);
+  if (!e) {
+    return {
+      html: `西暦${y}年の元号は<b>まだ決まっていません</b>。<div class="share-row"><button type="button" class="btn-sub" data-claim="${y}">${y}年から制定する</button></div>`,
+    };
+  }
+  const label = yearLabel(e.name, y - e.start_year + 1);
+  const len = e.end_year - e.start_year + 1;
+  return {
+    html: `西暦${y}年は <strong>${esc(label)}</strong><br><small>元号「${esc(e.name)}」${periodText(e.start_year, e.end_year)}（${len}年間）${mine.has(e.id) ? ' ★あなたが制定' : ''}</small>`,
+    label,
+  };
+}
+
+function showConversion() {
+  const v = $('convYear').value;
+  if (!v) {
+    $('convResult').innerHTML = '西暦を入力すると、その年が元号何年かを表示します。';
+    return;
+  }
+  const y = Number(v);
+  const info = convertInfo(y);
+  const share = info.label
+    ? `<div class="share-row"><a class="btn-x" href="${esc(xIntent(`西暦${y}年は${info.label}です`))}" target="_blank" rel="noopener">𝕏 でシェア</a></div>`
+    : '';
+  $('convResult').innerHTML = info.html + share;
+}
+
+// ===== ダイアログ =====
+function askConfirm(f) {
+  const d = $('confirmDlg');
+  if (typeof d.showModal !== 'function') {
+    return Promise.resolve(confirm(`元号「${f.name}」を${periodText(f.start, f.end)}として制定します。\n制定後は変更・取り消しができません。`));
+  }
+  return new Promise((resolve) => {
+    $('cfName').textContent = f.name;
+    $('cfText').textContent = `${periodText(f.start, f.end)}（${f.len}年間）`;
+    d.onclick = (ev) => {
+      const b = ev.target.closest('[data-ans]');
+      if (!b) return;
+      d.close();
+      resolve(b.dataset.ans === 'yes');
+    };
+    d.oncancel = () => resolve(false);
+    d.showModal();
+  });
+}
+
+function showDone(era) {
+  const d = $('done');
+  if (typeof d.showModal !== 'function') {
+    toast(`「${era.name}」を制定しました！一覧からシェアできます`);
+    return;
+  }
+  $('doneName').textContent = era.name;
+  $('doneText').textContent = `${periodText(era.start_year, era.end_year)}の元号は「${era.name}」に決まりました。`;
+  $('doneShare').href = xIntent(eraShareText(era));
+  d.showModal();
+}
+
+async function refresh() {
+  if (!store) return;
+  lastRefresh = Date.now();
+  try {
+    eras = (await store.list()).sort((a, b) => a.start_year - b.start_year);
+  } catch (err) {
+    console.error(err);
+    toast(errorMessage(err), true);
+  }
+  renderStats();
+  renderTimeline();
+  renderList();
+  updateForm();
+  showConversion();
+}
+
+// ===== イベント =====
+$('name').addEventListener('input', () => updateForm());
+$('start').addEventListener('input', () => updateForm({ follow: true }));
+$('len').addEventListener('change', () => updateForm());
+$('form').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-step]');
+  if (b) stepYear(Number(b.dataset.step));
+});
+$('nextFree').addEventListener('click', () => {
+  const y = firstFreeYear();
+  if (!y) return toast('空いている年がありません', true);
+  $('start').value = y;
+  updateForm({ follow: true });
+});
+
+$('form').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const f = readForm();
+  if (!f.ok || busy || !store) return;
+  $('name').blur();
+  if (!(await askConfirm(f))) return;
+  busy = true;
+  $('submit').textContent = '制定中…';
+  updateForm();
+  try {
+    const row = await store.create({ name: f.name, start_year: f.start, end_year: f.end });
+    mine.add(row.id);
+    saveMine();
+    $('name').value = '';
+    await refresh();
+    $('start').value = firstFreeYear() ?? '';
+    showDone(row);
+  } catch (err) {
+    console.error(err);
+    toast(errorMessage(err), true);
+    await refresh();
+  } finally {
+    busy = false;
+    $('submit').textContent = 'この元号を制定する';
+    updateForm({ follow: true });
+  }
+});
+
+$('track').addEventListener('click', (ev) => {
+  const x = ev.clientX - $('track').getBoundingClientRect().left;
+  const y = MIN + Math.floor(x / W);
+  if (y < MIN || y > MAX) return;
+  const e = eraAt(y);
+  if (e) {
+    $('convYear').value = y;
+    showConversion();
+    toast(`${y}年は${yearLabel(e.name, y - e.start_year + 1)}（${periodText(e.start_year, e.end_year)}）`);
+  } else {
+    $('start').value = y;
+    updateForm();
+    toast(`開始年を${y}年にしました`);
+  }
+});
+
+$('tl').addEventListener('scroll', scheduleTimeline, { passive: true });
+window.addEventListener('resize', scheduleTimeline);
+$('ov').addEventListener('click', (ev) => {
+  const rect = $('ov').getBoundingClientRect();
+  const ratio = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
+  scrollTimelineTo(MIN + Math.floor(ratio * TOTAL));
+});
+
+$('convForm').addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  $('convYear').blur();
+  showConversion();
+});
+$('convYear').addEventListener('input', () => {
+  if ($('convYear').value.length >= 4) showConversion();
+});
+$('convResult').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-claim]');
+  if (!b) return;
+  $('start').value = b.dataset.claim;
+  updateForm({ follow: true });
+  $('make').scrollIntoView({ behavior: 'smooth' });
+});
+
+$('more').addEventListener('click', () => {
+  listLimit += LIST_STEP;
+  renderList();
+});
+$('reload').addEventListener('click', async () => {
+  await refresh();
+  toast('最新の状態に更新しました');
+});
+$('doneClose').addEventListener('click', () => $('done').close());
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && Date.now() - lastRefresh > 15000) refresh();
+});
+
+// ===== 起動 =====
+async function init() {
+  const online = Boolean(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY);
+  $('rules').textContent = `ルール：${MIN}〜${MAX}年／漢字2文字／期間は1〜${MAX_LENGTH}年／制定済みの期間とは重ねられません`;
+  $('ovMin').textContent = MIN;
+  $('ovMax').textContent = MAX;
+  $('start').min = MIN;
+  $('start').max = MAX;
+  $('len').innerHTML = Array.from({ length: MAX_LENGTH }, (_, i) => `<option value="${i + 1}">${i + 1}年間</option>`).join('');
+  $('len').value = '10';
+  document.documentElement.style.setProperty('--w', `${W}px`);
+  $('track').style.width = `${TOTAL * W}px`;
+  showConversion();
+
+  if (online && isSecretKey(CONFIG.SUPABASE_KEY)) {
+    setMode('⚠ 秘密鍵が設定されています。Publishable key に変更してください', 'error');
+    console.error('SUPABASE_KEY に secret / service_role キーは使用できません。');
+    renderTimeline();
+    return;
+  }
+  try {
+    store = online ? await createSupabaseStore() : localStore;
+    setMode(online ? '🌐 オンライン：全プレイヤーで共有中' : '💻 デモモード：この端末内だけに保存', online ? 'online' : '');
+  } catch (err) {
+    console.error(err);
+    setMode('⚠ サーバーに接続できません。再読み込みしてください', 'error');
+    renderTimeline();
+    return;
+  }
+  await refresh();
+  $('start').value = firstFreeYear() ?? '';
+  updateForm({ follow: true });
+}
+init();
+</script>
+</body>
+</html>
